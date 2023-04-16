@@ -4,6 +4,7 @@
 #include <conio.h>
 #include <string.h>
 #include <windows.h>
+#include "admin.c"
 
 // variable definitions
 
@@ -11,6 +12,9 @@
 int menu();
 void createAccount();
 void login();
+void manageBus();
+void adminLogin();
+// void adminMenu();
 
 // main function
 void start()
@@ -28,8 +32,13 @@ void start()
             login();
             break;
         case 3:
+            printf("Admin Login Case\n");
+            adminLogin();
+            break;
+        case 4:
             printf("Exit Case\n");
             exit(0);
+
         default:
             break;
         }
@@ -43,7 +52,10 @@ int menu()
     int choice;
     printf("[1] Create New Account\n");
     printf("[2] Login\n");
-    printf("[3] Exit\n");
+    printf("[3] Admin Login\n");
+    printf("[4] Exit\n");
+
+    printf("--> ");
     scanf("%d", &choice);
     return choice;
 }
@@ -111,5 +123,29 @@ void login()
             printf("Incorrect Password \n");
             printf("Redirecting to Menu\n");
         }
+    }
+}
+
+void adminLogin()
+{
+    char inputPassword[20];
+    char location[] = "users\\admin";
+    char rightPassword[20];
+    FILE *fptr;
+
+    fptr = fopen(location, "r");
+
+    printf("Enter Admin Password: ");
+    scanf("%s", inputPassword);
+    fscanf(fptr, "%s", rightPassword);
+    if (strcmp(inputPassword, rightPassword) == 0)
+    {
+        printf("SuccessFully Logged In\n");
+        adminMenu();
+    }
+    else
+    {
+        printf("Incorrect Password \n");
+        printf("Redirecting to Menu\n");
     }
 }

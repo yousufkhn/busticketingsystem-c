@@ -1,4 +1,5 @@
 #include "login.c"
+#include "admin.h"
 
 int main()
 {
