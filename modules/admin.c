@@ -5,9 +5,20 @@
 #include <string.h>
 #include <windows.h>
 
+// struct defination
+struct Bus
+{
+    char source[50];
+    char destination[50];
+    int capacity;
+    int fare;
+};
+
 // function definitions
 
 void addBusDetails();
+void deleteBusDetails();
+void editBusDetails();
 
 // adminMenu defination
 
@@ -33,11 +44,11 @@ void adminMenu()
             break;
         case 2:
             printf("Delete Bus Details Case\n");
-            // deleteBusDetails(); // Function to delete bus details
+            deleteBusDetails(); // Function to delete bus details
             break;
         case 3:
             printf("Edit Bus Details Case\n");
-            // editBusDetails(); // Function to edit bus details
+            editBusDetails(); // Function to edit bus details
             break;
         case 4:
             printf("Exiting Admin Menu\n");
@@ -49,28 +60,11 @@ void adminMenu()
     }
 }
 
-struct Bus
-{
-    char source[50];
-    char destination[50];
-    int capacity;
-    int fare;
-};
-
 // Function to add bus details
 void addBusDetails()
 {
     char busNumber[10];
     char location[] = "busDetails\\";
-    // Open the file for appending
-    // FILE *fp = fopen("bus_details.txt", "a");
-
-    // Check if the file was opened successfully
-    // if (fp == NULL)
-    // {
-    //     printf("Error: Unable to open file!\n");
-    //     return;
-    // }
 
     // Get input from the user for the bus details
     struct Bus bus;
@@ -96,4 +90,61 @@ void addBusDetails()
     fclose(fptr);
 
     printf("Bus details added successfully!\n");
+}
+
+// function to deleteBusDetails
+void deleteBusDetails()
+{
+    char busNumber[10];
+    char location[] = "busDetails\\";
+
+    printf("Enter Bus Number to Delete: ");
+    scanf("%s", busNumber);
+
+    strcat(location, busNumber);
+    if (remove(location) == 0)
+        printf("Bus Details Deleted Successfully!\n");
+    else
+        printf("Failed to Delete Bus Details.\n");
+}
+
+void editBusDetails()
+{
+
+    char busNumber[10];
+    char source[40];
+    char destination[40];
+    int capacity;
+    int fare;
+
+    printf("Enter Bus Number to Edit Details: ");
+    scanf("%s", busNumber);
+
+    char location[] = "busDetails\\";
+    strcat(location, busNumber);
+    FILE *fptr;
+    fptr = fopen(location, "r+");
+
+    fscanf(fptr, "%[^,],%[^,],%d,%d\n", source, destination, &capacity, &fare);
+    printf("Existing Details:\n");
+    printf("Source: %s\n", source);
+    printf("Destination: %s\n", destination);
+    printf("Capacity: %d\n", capacity);
+    printf("Fare: %d\n", fare);
+
+    printf("Enter New Details:\n");
+    printf("Enter Source: ");
+    scanf("%s", source);
+    printf("Enter Destination: ");
+    scanf("%s", destination);
+    printf("Enter Capacity: ");
+    scanf("%d", &capacity);
+    printf("Enter Fare: ");
+    scanf("%d", &fare);
+
+    rewind(fptr);
+    fprintf(fptr, "%s,%s,%d,%d\n", source, destination, capacity, fare);
+
+    fclose(fptr);
+    printf("Details updated successfully!\n");
 }
