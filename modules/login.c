@@ -14,7 +14,6 @@ void createAccount();
 void login();
 void manageBus();
 void adminLogin();
-// void adminMenu();
 
 // main function
 void start()
