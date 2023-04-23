@@ -14,6 +14,8 @@ void createAccount();
 void login();
 void manageBus();
 void adminLogin();
+void userMenu();
+void bookTicket();
 
 // main function
 void start()
@@ -116,6 +118,7 @@ void login()
         if (strcmp(inputPassword, rightPassword) == 0)
         {
             printf("SuccessFully Logged In\n");
+            userMenu();
         }
         else
         {
@@ -146,5 +149,141 @@ void adminLogin()
     {
         printf("Incorrect Password \n");
         printf("Redirecting to Menu\n");
+    }
+}
+
+void userMenu()
+{
+    int choice;
+    while (1)
+    {
+        printf("\nWelcome to User Menu\n");
+        printf("[1] Book Ticket\n");
+        printf("[2] Cancle Ticket\n");
+        printf("[3] Exit\n");
+
+        printf("--> ");
+        scanf("%d", &choice);
+
+        switch (choice)
+        {
+        case 1:
+            printf("Book Ticket Case\n");
+            bookTicket(); // Function to book a ticket
+            break;
+        case 2:
+            printf("Cancel Ticket Case\n");
+            // cancelTicket(); // Function to cancel a ticket
+            break;
+        case 3:
+            printf("Exiting User Menu\n");
+            return;
+        default:
+            printf("Invalid Choice\n");
+            break;
+        }
+    }
+}
+
+void bookTicket()
+{
+    char source[50], destination[50];
+    int seats;
+    printf("Enter your source: ");
+    scanf("%s", source);
+    printf("Enter your destination: ");
+    scanf("%s", destination);
+
+    char location[] = "busDetails\\bus_details.txt";
+    FILE *fptr;
+    fptr = fopen(location, "r");
+
+    if (fptr == NULL)
+    {
+        printf("\nNo buses available!\n");
+        return;
+    }
+
+    char buffer[500];
+    int found = 0;
+    printf("\nAvailable Buses:\n");
+    while (fgets(buffer, 500, fptr))
+    {
+        char *busNumber = strtok(buffer, ",");
+        char *busSource = strtok(NULL, ",");
+        char *busDestination = strtok(NULL, ",");
+        int capacity = atoi(strtok(NULL, ","));
+        int fare = atoi(strtok(NULL, ","));
+        int availableSeats = atoi(strtok(NULL, ","));
+
+        if (strcmp(busSource, source) == 0 && strcmp(busDestination, destination) == 0)
+        {
+            found = 1;
+            printf("\nBus Number: %s\n", busNumber);
+            printf("Source: %s\n", busSource);
+            printf("Destination: %s\n", busDestination);
+            printf("Capacity: %d\n", capacity);
+            printf("Fare: %d\n", fare);
+            printf("Available Seats: %d\n", availableSeats);
+
+            printf("Enter number of seats to book: ");
+            scanf("%d", &seats);
+
+            if (seats > availableSeats)
+            {
+                printf("Sorry, only %d seats are available!\n", availableSeats);
+            }
+            else
+            {
+
+                srand(time(NULL));
+                int ticketID = rand();
+
+                char ticketLocation[] = "ticketDetails\\ticket_details.txt";
+                FILE *ticketFile;
+                ticketFile = fopen(ticketLocation, "a");
+                fprintf(ticketFile, "%d,%s,%s,%s,%d,%d,%d\n", ticketID, busNumber, source, destination, seats, fare * seats, 0);
+                fclose(ticketFile);
+
+                char tempLocation[] = "busDetails\\temp.txt";
+                FILE *fptr1, *fptr2;
+                fptr1 = fopen(location, "r");
+                fptr2 = fopen(tempLocation, "w");
+
+                char temp[500];
+                while (fgets(temp, 500, fptr1))
+                {
+                    if (strstr(temp, busNumber) != NULL)
+                    {
+                        int updatedSeats = availableSeats - seats;
+                        fprintf(fptr2, "%s,%s,%s,%d,%d,%d,\n", busNumber, busSource, busDestination, capacity, fare, updatedSeats);
+                    }
+                    else
+                    {
+                        fputs(temp, fptr2);
+                    }
+                }
+
+                fclose(fptr1);
+                fclose(fptr2);
+                fclose(fptr);
+
+                if (remove(location) == 0 && rename(tempLocation, location) == 0)
+                {
+                    printf("Ticket Booked Successfully!\n");
+                    return;
+                }
+                else
+                {
+                    printf("Failed to Book Ticket.\n");
+                    return;
+                }
+            }
+        }
+    }
+
+    if (found == 0)
+    {
+        printf("\nNo buses found between %s and %s!\n", source, destination);
     }
 }
