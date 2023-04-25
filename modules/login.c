@@ -4,7 +4,6 @@
 #include <conio.h>
 #include <string.h>
 #include <windows.h>
-#include "admin.c"
 
 // variable definitions
 
@@ -16,6 +15,8 @@ void manageBus();
 void adminLogin();
 void userMenu();
 void bookTicket();
+void cancelTicket();
+void adminMenu();
 
 // main function
 void start()
@@ -61,13 +62,11 @@ int menu()
     return choice;
 }
 
-// create new account function
-
 void createAccount()
 {
     char username[20];
     char password[20];
-    char location[] = "users\\";
+    char location[] = "data\\users\\";
 
     printf("Enter New UserName : ");
     scanf("%s", username);
@@ -82,20 +81,20 @@ void createAccount()
 
     printf("Create Password : ");
     scanf("%s", password);
-    // printf("%s", password);
 
     fprintf(fptr, "%s", password);
 
     fclose(fptr);
-    // printf("%s", location);
+
+    printf("Account Created Succesfully!\n");
 }
 
 void login()
 {
     char username[20];
     char inputPassword[20];
-    char location[] = "users\\";
-    char rightPassword[20];
+    char location[] = "data\\users\\";
+    char correctPassword[20];
     FILE *fptr;
 
     printf("Enter Your UserName : ");
@@ -114,8 +113,8 @@ void login()
     {
         printf("Enter Your Password: ");
         scanf("%s", inputPassword);
-        fscanf(fptr, "%s", rightPassword);
-        if (strcmp(inputPassword, rightPassword) == 0)
+        fscanf(fptr, "%s", correctPassword);
+        if (strcmp(inputPassword, correctPassword) == 0)
         {
             printf("SuccessFully Logged In\n");
             userMenu();
@@ -123,7 +122,7 @@ void login()
         else
         {
             printf("Incorrect Password \n");
-            printf("Redirecting to Menu\n");
+            printf("Redirecting to Login Page\n");
         }
     }
 }
@@ -131,16 +130,16 @@ void login()
 void adminLogin()
 {
     char inputPassword[20];
-    char location[] = "users\\admin";
-    char rightPassword[20];
+    char location[] = "data\\users\\admin";
+    char correctPassword[20];
     FILE *fptr;
 
     fptr = fopen(location, "r");
 
     printf("Enter Admin Password: ");
     scanf("%s", inputPassword);
-    fscanf(fptr, "%s", rightPassword);
-    if (strcmp(inputPassword, rightPassword) == 0)
+    fscanf(fptr, "%s", correctPassword);
+    if (strcmp(inputPassword, correctPassword) == 0)
     {
         printf("SuccessFully Logged In\n");
         adminMenu();
@@ -148,7 +147,7 @@ void adminLogin()
     else
     {
         printf("Incorrect Password \n");
-        printf("Redirecting to Menu\n");
+        printf("Redirecting to Login Page\n");
     }
 }
 
@@ -169,11 +168,11 @@ void userMenu()
         {
         case 1:
             printf("Book Ticket Case\n");
-            bookTicket(); // Function to book a ticket
+            bookTicket();
             break;
         case 2:
             printf("Cancel Ticket Case\n");
-            // cancelTicket(); // Function to cancel a ticket
+            cancelTicket();
             break;
         case 3:
             printf("Exiting User Menu\n");
@@ -194,7 +193,7 @@ void bookTicket()
     printf("Enter your destination: ");
     scanf("%s", destination);
 
-    char location[] = "busDetails\\bus_details.txt";
+    char location[] = "data\\busDetails\\bus_details.txt";
     FILE *fptr;
     fptr = fopen(location, "r");
 
@@ -235,17 +234,15 @@ void bookTicket()
             }
             else
             {
-
-                srand(time(NULL));
                 int ticketID = rand();
 
-                char ticketLocation[] = "ticketDetails\\ticket_details.txt";
+                char ticketLocation[] = "data\\ticketDetails\\ticket_details.txt";
                 FILE *ticketFile;
                 ticketFile = fopen(ticketLocation, "a");
                 fprintf(ticketFile, "%d,%s,%s,%s,%d,%d,%d\n", ticketID, busNumber, source, destination, seats, fare * seats, 0);
                 fclose(ticketFile);
 
-                char tempLocation[] = "busDetails\\temp.txt";
+                char tempLocation[] = "data\\busDetails\\temp.txt";
                 FILE *fptr1, *fptr2;
                 fptr1 = fopen(location, "r");
                 fptr2 = fopen(tempLocation, "w");
@@ -270,7 +267,7 @@ void bookTicket()
 
                 if (remove(location) == 0 && rename(tempLocation, location) == 0)
                 {
-                    printf("Ticket Booked Successfully!\n");
+                    printf("Ticket Booked Successfully!\n Your Ticket ID is : %d", ticketID);
                     return;
                 }
                 else
@@ -285,5 +282,39 @@ void bookTicket()
     if (found == 0)
     {
         printf("\nNo buses found between %s and %s!\n", source, destination);
+    }
+}
+
+void cancelTicket()
+{
+    char ticketID[10];
+    printf("Enter Ticket ID to Cancel: ");
+    scanf("%s", ticketID);
+
+    char location[] = "data\\ticketDetails\\ticket_details.txt";
+    char tempLocation[] = "data\\ticketDetails\\temp.txt";
+    FILE *fptr1, *fptr2;
+    fptr1 = fopen(location, "r");
+    fptr2 = fopen(tempLocation, "w");
+
+    char buffer[500];
+    while (fgets(buffer, 500, fptr1))
+    {
+        if (strstr(buffer, ticketID) == NULL)
+        {
+            fputs(buffer, fptr2);
+        }
+    }
+
+    fclose(fptr1);
+    fclose(fptr2);
+
+    if (remove(location) == 0 && rename(tempLocation, location) == 0)
+    {
+        printf("Ticket Cancelled Successfully!\n");
+    }
+    else
+    {
+        printf("Failed to Cancel Ticket.\n");
     }
 }

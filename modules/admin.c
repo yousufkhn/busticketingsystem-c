@@ -61,7 +61,7 @@ void addBusDetails()
 {
     system("cls");
     char busNumber[10];
-    char location[] = "busDetails\\bus_details.txt";
+    char location[] = "data\\busDetails\\bus_details.txt";
 
     // Get input from the user for the bus details
     struct Bus bus;
@@ -94,12 +94,12 @@ void addBusDetails()
 void deleteBusDetails()
 {
     char busNumber[10];
-    char location[] = "busDetails\\bus_details.txt";
+    char location[] = "data\\busDetails\\bus_details.txt";
 
     printf("Enter Bus Number to Delete: ");
     scanf("%s", busNumber);
 
-    char tempLocation[] = "busDetails\\temp.txt";
+    char tempLocation[] = "data\\busDetails\\temp.txt";
     FILE *fptr1, *fptr2;
     fptr1 = fopen(location, "r");
     fptr2 = fopen(tempLocation, "w");
