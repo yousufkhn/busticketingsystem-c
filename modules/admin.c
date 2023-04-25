@@ -39,11 +39,11 @@ void adminMenu()
         switch (choice)
         {
         case 1:
-            printf("Add Bus Details Case\n");
+            // printf("Add Bus Details Case\n");
             addBusDetails(); // Function to add bus details
             break;
         case 2:
-            printf("Delete Bus Details Case\n");
+            // printf("Delete Bus Details Case\n");
             deleteBusDetails(); // Function to delete bus details
             break;
         case 3:
@@ -96,6 +96,7 @@ void deleteBusDetails()
     char busNumber[10];
     char location[] = "data\\busDetails\\bus_details.txt";
 
+    system("cls");
     printf("Enter Bus Number to Delete: ");
     scanf("%s", busNumber);
 
